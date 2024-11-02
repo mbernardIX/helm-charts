@@ -3,7 +3,7 @@ common:
   nameOverride: ""
   fullnameOverride: ""
   image:
-    registry: docker.io
+    registry: central-mirror-cache.services.mts.ru
     pullSecrets: []
   secretKey:
     # -- Whether the chart should generate a secret key upon deployment.
@@ -59,14 +59,23 @@ apiServer:
     enabled: false
     className: ""
     size: 5Gi
-  extraEnv: []
-    # - name: "ALPINE_DATABASE_PASSWORD"
-    #   valueFrom:
-    #     secretKeyRef:
-    #       key: db-password
-    #       name: dependencytrack-secrets
-    # - name: ALPINE_DATABASE_MODE
-    #   value: "external"
+  extraEnv:
+    - name: ALPINE_OIDC_ENABLED
+      value: "true"
+    - name: ALPINE_OIDC_CLIENT_ID
+      value: "bigdata-deptrack"
+    - name: ALPINE_OIDC_ISSUER
+      value: "https://isso.mts.ru/auth/realms/mts"
+    - name: ALPINE_OIDC_USERNAME_CLAIM
+      value: "preferred_username"
+    - name: ALPINE_OIDC_TEAMS_CLAIM
+      value: "groups"
+    - name: ALPINE_OIDC_USER_PROVISIONING
+      value: "true"
+    - name: ALPINE_OIDC_TEAM_SYNCHRONIZATION
+      value: "false"
+    - name: ALPINE_OIDC_TEAMS_DEFAULT
+      value: "Portfolio Managers"
   extraEnvFrom: []
   # -- Additional containers to deploy. Supports templating.
   extraContainers: []
@@ -158,7 +167,13 @@ frontend:
     readOnlyRootFilesystem: false
     seccompProfile:
       type: RuntimeDefault
-  extraEnv: []
+  extraEnv:
+    - name: ALPINE_OIDC_CLIENT_ID
+      value: "bigdata-deptrack"
+    - name: ALPINE_OIDC_ISSUER
+      value: "https://isso.mts.ru/auth/realms/mts"
+    - name: OIDC_LOGIN_BUTTON_TEXT
+      value: "Login via ISSO"
   extraEnvFrom: []
   # -- Additional containers to deploy. Supports templating.
   extraContainers: []
